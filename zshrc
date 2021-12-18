@@ -71,7 +71,10 @@ if [ -d $ZPLUG_HOME ]; then
     zplug "plugins/gem", from:oh-my-zsh
 
     zplug "mafredri/zsh-async"
-    zplug "sindresorhus/pure", use:"pure.zsh", as:theme
+
+    if ! type "starship" &>/dev/null; then
+        zplug "sindresorhus/pure", use:"pure.zsh", as:theme
+    fi
 
     zplug "peco/peco", as:command, from:gh-r
     zplug "mollifier/anyframe"
@@ -97,7 +100,8 @@ if [ -d $HOME/.rbenv ]; then
 fi
 
 if [ -d $HOME/.pyenv ]; then
-    export PATH=$HOME/.pyenv/bin:$PATH
+    export PYENV_ROOT=$HOME/.pyenv
+    export PATH=$PYENV_ROOT/bin:$PATH
     eval "$(pyenv init -)"
 
     if [ -d $PYENV_ROOT/plugins/pyenv-virtualenv ]; then
@@ -107,4 +111,8 @@ fi
 
 if [ -e $HOME/.zsh/local.zsh ]; then
     source $HOME/.zsh/local.zsh
+fi
+
+if type "starship" &> /dev/null; then
+    eval "$(starship init zsh)"
 fi
