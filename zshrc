@@ -1,5 +1,5 @@
 export LANG=ja_JP.UTF-8
-export TERM=xterm-256color
+export TERM=screen-256color
 export CLICOLOR=true
 
 case ${OSTYPE} in
@@ -50,47 +50,45 @@ ex(){
 
 function chpwd() { ls }
 
-export ZPLUG_HOME=$HOME/.zplug
-if [ -d $ZPLUG_HOME ]; then
-    source $ZPLUG_HOME/init.zsh
+### Added by Zinit's installer
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+        print -P "%F{33} %F{34}Installation successful.%f%b" || \
+        print -P "%F{160} The clone has failed.%f%b"
+fi
 
-    zplug "zplug/zplug", hook-build:"zplug --self-manage"
-    zplug "zsh-users/zsh-completions"
-    zplug "zsh-users/zsh-autosuggestions"
-    zplug "zsh-users/zsh-history-substring-search"
-    zplug "zsh-users/zsh-syntax-highlighting", defer:2
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
-    zplug "marzocchi/zsh-notify"
+zinit ice wait lucid
+zinit light-mode for \
+    zsh-users/zsh-completions \
+    zsh-users/zsh-autosuggestions \
+    zsh-users/zsh-history-substring-search \
+    zdharma/fast-syntax-highlighting \
 
-    zplug "lib/clipboard", from:oh-my-zsh
-    zplug "lib/history", from:oh-my-zsh
-    zplug "plugins/gitfast", from:oh-my-zsh
-    zplug "plugins/pip", from:oh-my-zsh
-    zplug "plugins/python", from:oh-my-zsh
-    zplug "plugins/pyenv", from:oh-my-zsh
-    zplug "plugins/gem", from:oh-my-zsh
+zinit ice from"gh-r" as"program" wait lucid
+zinit light junegunn/fzf
+zinit ice wait lucid
+zinit light mollifier/anyframe
+alias cdd=anyframe-widget-cdr
+alias hist=anyframe-widget-execute-history
+alias prkl=anyframe-widget-kill
+bindkey "^r" anyframe-widget-put-history
+bindkey "^f" anyframe-widget-insert-filename
 
-    zplug "mafredri/zsh-async"
+zinit ice as"command" from"gh-r" \
+          atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
+          atpull"%atclone" src"init.zsh"
+zinit light starship/starship
 
-    if ! type "starship" &>/dev/null; then
-        zplug "sindresorhus/pure", use:"pure.zsh", as:theme
-    fi
+### End of Zinit's installer chunk
 
-    zplug "peco/peco", as:command, from:gh-r
-    zplug "mollifier/anyframe"
-    alias cdd=anyframe-widget-cdr
-    alias hist=anyframe-widget-execute-history
-    alias prkl=anyframe-widget-kill
-    bindkey "^r" anyframe-widget-put-history
-    bindkey "^f" anyframe-widget-insert-filename
-
-    if ! zplug check; then
-        printf "Install? [y/N]"
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
-    zplug load
+if [ -e $HOME/.zsh/local.zsh ]; then
+    source $HOME/.zsh/local.zsh
 fi
 
 if [ -d $HOME/.rbenv ]; then
@@ -109,10 +107,7 @@ if [ -d $HOME/.pyenv ]; then
     fi
 fi
 
-if [ -e $HOME/.zsh/local.zsh ]; then
-    source $HOME/.zsh/local.zsh
-fi
-
 if type "starship" &> /dev/null; then
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
     eval "$(starship init zsh)"
 fi
