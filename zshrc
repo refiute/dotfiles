@@ -116,3 +116,7 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+if type "starship" &> /dev/null; then
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+    eval "$(starship init zsh)"
+fi

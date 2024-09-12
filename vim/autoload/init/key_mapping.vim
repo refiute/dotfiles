@@ -1,10 +1,10 @@
-inoremap <C-c> <ESC>
+" inoremap <C-c> <ESC>
 
 noremap ; :
 noremap : ;
 
 nnoremap [Tab] <Nop>
-nmap <C-m> [Tab]
+nmap <S-m> [Tab]
 nnoremap <silent> [Tab]n :<C-u>tabnew<CR>
 nnoremap [Tab]k gt
 nnoremap [Tab]j gT
