@@ -12,25 +12,13 @@ if &runtimepath !~ '/dein.vim'
     execute 'set runtimepath+=' . fnamemodify(s:dein_repo_path, ':p')
 endif
 
-if dein#load_state(s:dein_path)
-    call dein#begin(s:dein_path)
+call dein#begin(s:dein_path)
 
-    call dein#load_toml("~/.config/nvim/autoload/dein/plugins.toml")
-    call dein#load_toml("~/.config/nvim/autoload/dein/plugins-lazy.toml", {'lazy': 1})
+call dein#load_toml("~/.config/nvim/autoload/dein/plugins.toml")
+call dein#load_toml("~/.config/nvim/autoload/dein/plugins-lazy.toml", {'lazy': 1})
 
-    call dein#end()
-    call dein#save_state()
-endif
+call dein#end()
 
 if dein#check_install()
     call dein#install()
 endif
-
-function! s:deinClean()
-    if len(dein#check_clean())
-        call map(dein#check_clean(), 'delete(v:val, "rf")')
-    else
-        echo '[Error] no disabled plugins'
-    endif
-endfunction
-command! DeinClean :call s:deinClean()

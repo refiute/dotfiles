@@ -9,6 +9,9 @@ if [ ! -d $HOME/dotfiles ]; then
 fi
 
 ln -s $HOME/dotfiles/zshrc $HOME/.zshrc
+mkdir -p ~/.zsh
+ln -s $HOME/dotfiles/zsh/fzf.zsh $HOME/.zsh/
+
 ln -s $HOME/dotfiles/tmux.conf $HOME/.tmux.conf
 
 mkdir -p $HOME/.config

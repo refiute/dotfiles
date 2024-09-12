@@ -8,13 +8,13 @@ build = 'make'
 
 [[plugins]]
 repo = 'cocopon/iceberg.vim'
-hook_add = '''
+hook_source = '''
     colorscheme iceberg
 '''
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
-hook_add = '''
+hook_source = '''
     let g:lightline = { 'colorscheme': 'iceberg' }
 '''
 
@@ -27,7 +27,7 @@ repo = 'scrooloose/nerdtree'
 [[plugins]]
 repo = 'jistr/vim-nerdtree-tabs'
 depends = 'nerdtree'
-hook_add = '''
+hook_source = '''
     let g:nerdtree_tabs_open_on_console_startup = 1
 '''
 
@@ -35,4 +35,24 @@ hook_add = '''
 repo = 'Shougo/neosnippet-snippets'
 
 [[plugins]]
+repo = 'honza/vim-snippets'
+
+[[plugins]]
 repo = 'vim-jp/vimdoc-ja'
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+hook_source = '''
+    let g:deoplete#enable_at_startup = 1
+'''
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+hook_source = '''
+    imap <C-k> <Plug>(neosnippet_expand_or_jump)
+    smap <C-k> <Plug>(neosnippet_expand_or_jump)
+    xmap <C-k> <Plug>(neosnippet_expand_target)
+    if has('conceal')
+        set conceallevel=2 concealcursor=niv
+    endif
+'''

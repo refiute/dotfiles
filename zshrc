@@ -1,4 +1,3 @@
-export LANG=ja_JP.UTF-8
 export TERM=xterm-256color
 export CLICOLOR=true
 
@@ -9,10 +8,10 @@ case ${OSTYPE} in
         alias ls='ls --color=auto'
 esac
 
+alias vim='nvim'
 alias ll='ls -lhtr'
 alias la='ls -A'
 alias lla='ll -A'
-alias vim='nvim'
 
 setopt auto_pushd
 setopt pushd_ignore_dups
@@ -23,6 +22,7 @@ setopt hist_ignore_all_dups
 setopt numeric_glob_sort
 setopt prompt_subst
 setopt auto_menu
+bindkey -e
 
 ex(){
     if [ -f $1 ] ; then
@@ -50,61 +50,69 @@ ex(){
 
 function chpwd() { ls }
 
-export ZPLUG_HOME=$HOME/.zplug
-if [ -d $ZPLUG_HOME ]; then
-    source $ZPLUG_HOME/init.zsh
-
-    zplug "zplug/zplug", hook-build:"zplug --self-manage"
-    zplug "zsh-users/zsh-completions"
-    zplug "zsh-users/zsh-autosuggestions"
-    zplug "zsh-users/zsh-history-substring-search"
-    zplug "zsh-users/zsh-syntax-highlighting", defer:2
-
-    zplug "marzocchi/zsh-notify"
-
-    zplug "lib/clipboard", from:oh-my-zsh
-    zplug "lib/history", from:oh-my-zsh
-    zplug "plugins/gitfast", from:oh-my-zsh
-    zplug "plugins/pip", from:oh-my-zsh
-    zplug "plugins/python", from:oh-my-zsh
-    zplug "plugins/pyenv", from:oh-my-zsh
-    zplug "plugins/gem", from:oh-my-zsh
-
-    zplug "mafredri/zsh-async"
-    zplug "sindresorhus/pure", use:"pure.zsh", as:theme
-
-    zplug "peco/peco", as:command, from:gh-r
-    zplug "mollifier/anyframe"
-    alias cdd=anyframe-widget-cdr
-    alias hist=anyframe-widget-execute-history
-    alias prkl=anyframe-widget-kill
-    bindkey "^r" anyframe-widget-put-history
-    bindkey "^f" anyframe-widget-insert-filename
-
-    if ! zplug check; then
-        printf "Install? [y/N]"
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
-    zplug load
-fi
-
-if [ -d $HOME/.rbenv ]; then
-    export RBENV_ROOT=$HOME/.rbenv
-    export PATH=$RBENV_ROOT/bin:$PATH
-    eval "$(rbenv init -)"
-fi
-
-if [ -d $HOME/.pyenv ]; then
-    export PATH=$HOME/.pyenv/bin:$PATH
-    eval "$(pyenv init -)"
-
-    if [ -d $PYENV_ROOT/plugins/pyenv-virtualenv ]; then
-        eval "$(pyenv virtualenv-init -)"
-    fi
-fi
-
 if [ -e $HOME/.zsh/local.zsh ]; then
     source $HOME/.zsh/local.zsh
 fi
+
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
+sheldon_cache="$cache_dir/sheldon.zsh"
+sheldon_toml="$HOME/.config/sheldon/plugins.toml"
+if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
+  mkdir -p $cache_dir
+  sheldon source > $sheldon_cache
+fi
+source "$sheldon_cache"
+unset cache_dir sheldon_cache sheldon_toml
+
+if [ -z $SINGULARITY_NAME ]; then
+    export LANG=en_US.UTF-8
+
+    export RBENV_ROOT=$ENV_ROOT/.rbenv
+    if [ -d $RBENV_ROOT ]; then
+        export PATH=$RBENV_ROOT/bin:$PATH
+        eval "$(rbenv init -)"
+    fi
+
+    export PYENV_ROOT=$ENV_ROOT/.pyenv
+    if [ -d $PYENV_ROOT ]; then
+        export PATH=$PYENV_ROOT/bin:$PATH
+        export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+        eval "$(pyenv init -)"
+        eval "$(pyenv init --path)"
+
+        if [ -d $PYENV_ROOT/plugins/pyenv-virtualenv ]; then
+            eval "$(pyenv virtualenv-init -)"
+        fi
+    fi
+
+    if [ -d $ENV_ROOT/.rye ]; then
+        source "$ENV_ROOT/.rye/env"
+    fi
+
+    if type direnv &>/dev/null; then
+        eval "$(direnv hook zsh)"
+    fi
+
+    export PLENV_ROOT=$ENV_ROOT/.plenv
+    if [ -d $PLENV_ROOT ]; then
+        export PATH=$PLENV_ROOT/bin:$PATH
+        eval "$(plenv init -)"
+    fi
+
+fi
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/conda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
+        . "/opt/conda/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/conda/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
