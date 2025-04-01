@@ -10,7 +10,9 @@ fi
 
 ln -s $HOME/dotfiles/zshrc $HOME/.zshrc
 mkdir -p ~/.zsh
-ln -s $HOME/dotfiles/zsh/fzf.zsh $HOME/.zsh/
+ln -s $HOME/dotfiles/zsh/fzf.zsh $HOME/.zsh/fzf.zsh
+mkdir -p $HOME/.config/sheldon
+ln -s $HOME/dotfiles/zsh/plugins.toml $HOME/.config/sheldon/plugins.toml
 
 ln -s $HOME/dotfiles/tmux.conf $HOME/.tmux.conf
 

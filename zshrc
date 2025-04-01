@@ -13,6 +13,9 @@ alias ll='ls -lhtr'
 alias la='ls -A'
 alias lla='ll -A'
 
+autoload -Uz colors && colors
+autoload -Uz compinit && compinit
+
 setopt auto_pushd
 setopt pushd_ignore_dups
 setopt magic_equal_subst
@@ -50,8 +53,10 @@ ex(){
 
 function chpwd() { ls }
 
-if [ -e $HOME/.zsh/local.zsh ]; then
-    source $HOME/.zsh/local.zsh
+PATH=$HOME/.local/bin:$HOME/usr/bin:$PATH
+if ! command -v sheldon &> /dev/null; then
+    curl --proto '=https' -fLsS https://rossmacarthur.github.io/install/crate.sh \
+        | bash -s -- --repo rossmacarthur/sheldon --to ~/.local/bin
 fi
 
 cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
@@ -67,56 +72,21 @@ unset cache_dir sheldon_cache sheldon_toml
 if [ -z $SINGULARITY_NAME ]; then
     export LANG=en_US.UTF-8
 
-    export RBENV_ROOT=$ENV_ROOT/.rbenv
-    if [ -d $RBENV_ROOT ]; then
-        export PATH=$RBENV_ROOT/bin:$PATH
-        eval "$(rbenv init -)"
-    fi
-
-    export PYENV_ROOT=$ENV_ROOT/.pyenv
-    if [ -d $PYENV_ROOT ]; then
-        export PATH=$PYENV_ROOT/bin:$PATH
-        export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-        eval "$(pyenv init -)"
-        eval "$(pyenv init --path)"
-
-        if [ -d $PYENV_ROOT/plugins/pyenv-virtualenv ]; then
-            eval "$(pyenv virtualenv-init -)"
-        fi
-    fi
-
-    if [ -d $ENV_ROOT/.rye ]; then
-        source "$ENV_ROOT/.rye/env"
-    fi
-
     if type direnv &>/dev/null; then
         eval "$(direnv hook zsh)"
     fi
-
-    export PLENV_ROOT=$ENV_ROOT/.plenv
-    if [ -d $PLENV_ROOT ]; then
-        export PATH=$PLENV_ROOT/bin:$PATH
-        eval "$(plenv init -)"
-    fi
-
 fi
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/opt/conda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
-        . "/opt/conda/etc/profile.d/conda.sh"
-    else
-        export PATH="/opt/conda/bin:$PATH"
-    fi
+if ! command -v starship &> /dev/null; then
+    mkdir -p ~/usr/bin
+    curl -sS https://starship.rs/install.sh \
+    | sh -s -- -b ~/usr/bin
 fi
-unset __conda_setup
-# <<< conda initialize <<<
-
 if type "starship" &> /dev/null; then
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
     eval "$(starship init zsh)"
+fi
+
+if [ -e $HOME/.zsh/local.zsh ]; then
+    source $HOME/.zsh/local.zsh
 fi
